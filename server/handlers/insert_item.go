@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"time"
 	"net/http"
 
 	"github.com/gustavosvalentim/in_memory_cache/common"
@@ -15,7 +16,11 @@ func InsertItemHandler(w *http.ResponseWriter, r *http.Request, store *common.Ca
 		return
 	}
 
-	store.Add(cacheItem)
+	now := time.Now().
+		Add(time.Second * time.Duration(15)).
+		Unix()
+
+	store.Add(cacheItem, now)
 
 	marshalItem, err := cacheItem.Marshal()
 	if err != nil {

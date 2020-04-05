@@ -10,7 +10,7 @@ import (
 
 // GetItemHandler returns CacheItems stored in items
 func GetItemHandler(w *http.ResponseWriter, r *http.Request, store *common.CacheStore) {
-	b, err := json.Marshal(store.Store)
+	b, err := json.Marshal(store.Items)
 	if err != nil {
 		fmt.Fprintf(*w, "Error")
 		return

@@ -2,42 +2,52 @@ package common
 
 import (
 	"time"
+	"math/rand"
 )
 
+type CacheStoreItems map[int]CacheItem
+type CacheStoreMetas map[int]CacheItemMeta
+
 type CacheStore struct {
-	Store		[]CacheItem
-	Metas		[]CacheItemMeta
+	Items		CacheStoreItems
+	Metas		CacheStoreMetas
 }
 
-func (store *CacheStore) Add(item CacheItem) {
-	now := time.Now().
-		Add(time.Second * time.Duration(15)).
-		Unix()
-
-	itemMeta := CacheItemMeta{Expires: now}
-	store.Store = append(store.Store, item)
-	store.Metas = append(store.Metas, itemMeta)
+func (store *CacheStore) Add(item CacheItem, expiration int64) {
+	itemMeta := CacheItemMeta{Expires: expiration}
+	randint := rand.Int()
+	store.Items[randint] = item
+	store.Metas[randint] = itemMeta
 }
 
 func (store *CacheStore) DeepCopy() *CacheStore {
 	metas := store.Metas
-	storeItems := store.Store
+	storeItems := store.Items
 
 	return &CacheStore{
-		Store:	storeItems,
+		Items:	storeItems,
 		Metas:	metas,
 	}
 }
 
-func (store *CacheStore) Populate(channel chan<- int) {
-	for i := range store.Store {
-		channel <- i
+func (store *CacheStore) Slice(i int) {
+	delete(store.Items, i)
+	delete(store.Metas, i)
+}
+
+func (store *CacheStore) Populate(items []CacheItem) {
+	now := time.Now().
+		Add(time.Second * time.Duration(15)).
+		Unix()
+
+	for i := range items {
+		store.Add(items[i], now)
 	}
 }
 
 func NewStore() *CacheStore {
 	return &CacheStore{
-		Store:	make([]CacheItem, 0),
-		Metas:	make([]CacheItemMeta, 0),
+		Items:	make(CacheStoreItems, 0),
+		Metas:	make(CacheStoreMetas, 0),
 	}
 }
