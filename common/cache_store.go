@@ -19,6 +19,16 @@ func (store *CacheStore) Add(item CacheItem) {
 	store.Metas = append(store.Metas, itemMeta)
 }
 
+func (store *CacheStore) DeepCopy() *CacheStore {
+	metas := store.Metas
+	storeItems := store.Store
+
+	return &CacheStore{
+		Store:	storeItems,
+		Metas:	metas,
+	}
+}
+
 func NewStore() *CacheStore {
 	return &CacheStore{
 		Store:	make([]CacheItem, 0),
