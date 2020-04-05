@@ -29,6 +29,12 @@ func (store *CacheStore) DeepCopy() *CacheStore {
 	}
 }
 
+func (store *CacheStore) Populate(channel chan<- int) {
+	for i := range store.Store {
+		channel <- i
+	}
+}
+
 func NewStore() *CacheStore {
 	return &CacheStore{
 		Store:	make([]CacheItem, 0),
