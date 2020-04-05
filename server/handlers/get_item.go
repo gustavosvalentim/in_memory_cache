@@ -5,11 +5,12 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.io/gustavosvalentim/in_memory_cache/common"
+	"github.com/gustavosvalentim/in_memory_cache/common"
 )
 
-func GetItemHandler(w *http.ResponseWriter, r *http.Request, items *[][]common.CacheItem) {
-	b, err := json.Marshal(*items)
+// GetItemHandler returns CacheItems stored in items
+func GetItemHandler(w *http.ResponseWriter, r *http.Request, store *common.CacheStore) {
+	b, err := json.Marshal(store.Store)
 	if err != nil {
 		fmt.Fprintf(*w, "Error")
 		return

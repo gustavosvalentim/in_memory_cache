@@ -2,26 +2,25 @@ package handlers
 
 import (
 	"fmt"
-	"encoding/json"
 	"net/http"
-	"io/ioutil"
 
-	"github.io/gustavosvalentim/in_memory_cache/common"
+	"github.com/gustavosvalentim/in_memory_cache/common"
 )
 
-func InsertItemHandler(w *http.ResponseWriter, r *http.Request, items *[][]common.CacheItem) {
-	body, err := ioutil.ReadAll(r.Body)
+// InsertItemHandler will accept an CacheItem JSON object and after Unmarshal will add to items
+func InsertItemHandler(w *http.ResponseWriter, r *http.Request, store *common.CacheStore) {
+	cacheItem, err := common.NewCacheItem(r.Body)
 	if err != nil {
-		fmt.Fprintf(*w, "Error")
-		return
-	}
-	unmarshal, err := common.UnmarshalCacheItem(body)
-	if err != nil {
-		fmt.Fprintf(*w, "Unmarshal Error")
+		fmt.Fprintf(*w, err.Error())
 		return
 	}
 
-	*items = append(*items, unmarshal)
+	store.Add(cacheItem)
 
-	json.NewEncoder(*w).Encode(unmarshal)
+	marshalItem, err := cacheItem.Marshal()
+	if err != nil {
+		fmt.Fprintf(*w, err.Error())
+		return
+	}
+	fmt.Fprintf(*w, marshalItem)
 }
