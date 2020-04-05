@@ -10,9 +10,8 @@ import (
 
 // InvalidateCacheHandler will invalidate all cache, making items as an array of CacheItem
 func InvalidateCacheHandler(w *http.ResponseWriter, r *http.Request, store *common.CacheStore) {
-	store.Items = make(common.CacheStoreItems, 0)
-	store.Metas = make(common.CacheStoreMetas, 0)
-	b, err := json.Marshal(*store)
+	store.Invalidate()
+	b, err := json.Marshal(store.GetItems())
 	if err != nil {
 		fmt.Fprintln(*w, "Error")
 		return

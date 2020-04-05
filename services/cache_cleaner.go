@@ -15,14 +15,8 @@ func CacheCleaner(store *common.CacheStore) {
 		for {
 			select {
 			case t := <-ticker.C:
-				fmt.Println(t, len(store.Metas))
-				for i := range store.Metas {
-					if val, ok := store.Metas[i]; ok {
-						if (t.Unix() >= val.Expires) {
-							go store.Slice(i)
-						}
-					}
-				}
+				fmt.Println(t, len(store.Shards[0].Metas))
+				go store.Clean(t.Unix())
 			}
 		}
 	}()

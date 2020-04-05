@@ -10,7 +10,15 @@ import (
 
 // GetItemHandler returns CacheItems stored in items
 func GetItemHandler(w *http.ResponseWriter, r *http.Request, store *common.CacheStore) {
-	b, err := json.Marshal(store.Items)
+	itemList := make([]common.CacheItem, 0)
+
+	for _, shard := range store.Shards {
+		for _, item := range shard.Items {
+			itemList = append(itemList, item)
+		}
+	}
+
+	b, err := json.Marshal(itemList)
 	if err != nil {
 		fmt.Fprintf(*w, "Error")
 		return
