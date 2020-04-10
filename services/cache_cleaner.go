@@ -9,14 +9,23 @@ import (
 
 // CacheCleaner tick every 1 second and receive values in channel
 func CacheCleaner(store *common.CacheStore) {
-	ticker := time.NewTicker(1 * time.Second)
-
+	ticker := time.NewTicker(store.DefaultTTL)
+	
 	go func() {
 		for {
 			select {
 			case t := <-ticker.C:
-				fmt.Println(t, len(store.Shards[0].Metas))
-				go store.Clean(t.Unix())
+				fmt.Println("[*] ", t)
+
+				items := store.Scan()
+				for i := range items {
+					item := items[i]
+					if (item.Key != "") {
+						fmt.Println("[*] Deleting item ID: ", item.Key)
+
+						store.Delete(item.Key)
+					}
+				}
 			}
 		}
 	}()

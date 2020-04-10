@@ -29,13 +29,11 @@ func Serve(store *common.CacheStore) {
 
 	itemsRouter := r.PathPrefix("/items").Subrouter()
 	itemsRouter.Methods("POST").HandlerFunc(wrapHandler(handlers.InsertItemHandler))
-	itemsRouter.Methods("GET").HandlerFunc(wrapHandler(handlers.GetItemHandler))
+	itemsRouter.Path("/{key}").
+		Methods("GET").HandlerFunc(wrapHandler(handlers.GetItemHandler))
 	itemsRouter.Methods("DELETE").HandlerFunc(wrapHandler(handlers.InvalidateCacheHandler))
 
-	populateRoute := r.PathPrefix("/populate").Subrouter()
-	populateRoute.Methods("POST").HandlerFunc(wrapHandler(handlers.PopulateHandler))
-
-	r.Use(middlewares.JSONMiddleware)
+	r.Use(middlewares.JSON, middlewares.Logging)
 
 	log.Fatal(http.ListenAndServe(":8090", r))
 }

@@ -7,9 +7,8 @@ import (
 )
 
 func main() {
-	store := common.NewStore()
+	store := common.NewCacheStore(1)
 
 	services.CacheCleaner(store)
-
 	server.Serve(store)
 }
